@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Emulador GBA</title>
+
+<style>
+body {
+    background: #111827;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    color: #38bdf8;
+}
+
+button, input {
+    padding: 12px;
+    margin: 10px;
+    border-radius: 8px;
+}
+
+#game {
+    width: 100%;
+    max-width: 800px;
+    height: 600px;
+    margin: 20px auto;
+    background: black;
+}
+
+#status {
+    color: #a7f3d0;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎮 EMULADOR GBA</h1>
+<p>Selecione uma ROM de Game Boy Advance.</p>
+
+<input type="file" id="rom" accept=".gba,.bin">
+<p id="status">Aguardando um jogo...</p>
+
+<div id="game"></div>
+
+<script>
+const input = document.getElementById("rom");
+const statusText = document.getElementById("status");
+
+input.addEventListener("change", function() {
+    const file = input.files[0];
+
+    if (!file) return;
+
+    if (!/\.(gba|bin)$/i.test(file.name)) {
+        statusText.textContent = "Selecione um arquivo GBA válido.";
+        return;
+    }
+
+    statusText.textContent = "Carregando o jogo...";
+
+    const romURL = URL.createObjectURL(file);
+
+    window.EJS_player = "#game";
+    window.EJS_core = "gba";
+    window.EJS_gameName = file.name;
+    window.EJS_gameUrl = romURL;
+    window.EJS_pathtodata =
+        "https://cdn.emulatorjs.org/stable/data/";
+
+    const oldLoader = document.getElementById("emulator-loader");
+    if (oldLoader) oldLoader.remove();
+
+    const script = document.createElement("script");
+    script.id = "emulator-loader";
+    script.src =
+        "https://cdn.emulatorjs.org/stable/data/loader.js";
+
+    script.onload = function() {
+        statusText.textContent =
+            "Emulador carregado. Aguarde o jogo iniciar.";
+    };
+
+    script.onerror = function() {
+        statusText.textContent =
+            "Erro ao carregar. Verifique sua conexão.";
+    };
+
+    document.body.appendChild(script);
+});
+</script>
+
+</body>
+</html>
